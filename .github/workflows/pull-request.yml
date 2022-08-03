@@ -12,6 +12,8 @@ jobs:
       - name: Get branch name
         id: branch-name
         uses: tj-actions/branch-names@v5.2
+      - name: set up
+        run: echo FOO=foobar--$(date +%s) >> $GITHUB_ENV
       - name: validation
         run: |
           if ${{ (steps.branch-name.outputs.current_branch != 'master') &&
@@ -28,7 +30,6 @@ jobs:
       - name: create new branch
         if: env.NEED == 'true'
         uses: peterjgrainger/action-create-branch@v2.2.0
-        run: echo FOO=foobar--$(date +%s) >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
