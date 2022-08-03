@@ -1,12 +1,14 @@
 name: pull-request
 'on':
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - master
       - canary
       - qa
 jobs:
-  pull-request:
+  backporting:
     runs-on: ubuntu-latest
     steps:
       - name: Get branch name
