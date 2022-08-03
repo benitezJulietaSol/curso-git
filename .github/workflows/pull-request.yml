@@ -14,9 +14,9 @@ jobs:
         uses: tj-actions/branch-names@v5.2
       - name: validation
         run: |
-          if ${{ (steps.branch-name.outputs.ref_branch != 'canary') &&
-          (steps.branch-name.outputs.ref_branch != 'qa') &&
-          (steps.branch-name.outputs.ref_branch != 'develop') }}; then
+          if ${{ (steps.branch-name.outputs.head_ref_branch != 'canary') &&
+          (steps.branch-name.outputs.head_ref_branch != 'qa') &&
+          (steps.branch-name.outputs.head_ref_branch != 'develop') }}; then
               echo "NEED=true" >> "$GITHUB_ENV"
           else
               echo "NEED=false" >> "$GITHUB_ENV"
@@ -28,6 +28,7 @@ jobs:
         if: ${{ steps.branch-name.outputs.ref_branch == 'master' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
+          source_branch: backport/master-canary
           destination_branch: canary
           github_token: ${{ github.token }}
           pr_title: >-
@@ -37,6 +38,7 @@ jobs:
         if: ${{ steps.branch-name.outputs.ref_branch == 'canary' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
+          source_branch: backport/canary-qa
           destination_branch: qa
           github_token: ${{ github.token }}
           pr_title: >-
@@ -46,6 +48,7 @@ jobs:
         if: ${{ steps.branch-name.outputs.ref_branch == 'qa' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
+          source_branch: backport/qa-dev
           destination_branch: develop
           github_token: ${{ github.token }}
           pr_title: >-
