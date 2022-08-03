@@ -14,9 +14,9 @@ jobs:
         uses: tj-actions/branch-names@v5.2
       - name: validation
         run: |
-          if [[ (steps.branch-name.outputs.ref_branch != 'canary') &&
+          if ${{ (steps.branch-name.outputs.ref_branch != 'canary') &&
           (steps.branch-name.outputs.ref_branch != 'qa') &&
-          (steps.branch-name.outputs.ref_branch != 'develop') ]]; then
+          (steps.branch-name.outputs.ref_branch != 'develop') }}; then
               echo "NEED=true" >> "$GITHUB_ENV"
           else
               echo "NEED=false" >> "$GITHUB_ENV"
