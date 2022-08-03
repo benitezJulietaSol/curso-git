@@ -14,6 +14,18 @@ jobs:
         uses: tj-actions/branch-names@v5.2
       - name: set up
         run: echo FOO=foobar--$(date +%s) >> $GITHUB_ENV
+      - name: borrar esto 1
+        env:
+          STRATEGY_1: ${{ steps.branch-name.outputs.base_ref_branch }}
+        run: echo "$STRATEGY_1"
+        - name: borrar esto 2
+        env:
+          STRATEGY_2: ${{ steps.branch-name.outputs.current_branch }}
+        run: echo "$STRATEGY_2"
+        - name: borrar esto 3
+        env:
+          STRATEGY_3: ${{ steps.branch-name.outputs.head_ref_branch }}
+        run: echo "$STRATEGY_3"
       - name: validation
         run: |
           if ${{ (steps.branch-name.outputs.head_ref_branch != 'canary') &&
