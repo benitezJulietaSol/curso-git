@@ -14,9 +14,9 @@ jobs:
         uses: tj-actions/branch-names@v5.2
       - name: validation
         run: |
-          if ${{ (steps.branch-name.outputs.head_ref_branch != 'canary') &&
-          (steps.branch-name.outputs.head_ref_branch != 'qa') &&
-          (steps.branch-name.outputs.head_ref_branch != 'develop') }}; then
+          if ${{ (steps.branch-name.outputs.ref_branch != 'canary') &&
+          (steps.branch-name.outputs.ref_branch != 'qa') &&
+          (steps.branch-name.outputs.ref_branch != 'develop') }}; then
               echo "NEED=true" >> "$GITHUB_ENV"
           else
               echo "NEED=false" >> "$GITHUB_ENV"
@@ -24,31 +24,39 @@ jobs:
       - name: checkout
         if: env.NEED == 'true'
         uses: actions/checkout@v2
+      - name: create new branch
+        if: env.NEED == 'true'
+        uses: peterjgrainger/action-create-branch@v2.2.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: 'backport/release-candidate'
+          sha: '${{ github.event.pull_request.head.sha }}'
       - name: backport-to-canary
-        if: ${{ steps.branch-name.outputs.ref_branch == 'master' && env.NEED == 'true' }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'master' && env.NEED == 'true' && sha }}
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: backport/master-canary
+          source_branch: backport/release-candidate
           destination_branch: canary
           github_token: ${{ github.token }}
           pr_title: >-
              [Backport ${{ steps.branch-name.outputs.ref_branch }}] to
               canary
       - name: backport-to-qa
-        if: ${{ steps.branch-name.outputs.ref_branch == 'canary' && env.NEED == 'true' }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'canary' && env.NEED == 'true' && sha }}
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: backport/canary-qa
+          source_branch: backport/release-candidate
           destination_branch: qa
           github_token: ${{ github.token }}
           pr_title: >-
             [Backport ${{ steps.branch-name.outputs.ref_branch }}] to 
              qa
       - name: backport-to-dev
-        if: ${{ steps.branch-name.outputs.ref_branch == 'qa' && env.NEED == 'true' }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'qa' && env.NEED == 'true' && sha }}
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: backport/qa-dev
+          source_branch: backport/release-candidate
           destination_branch: develop
           github_token: ${{ github.token }}
           pr_title: >-
