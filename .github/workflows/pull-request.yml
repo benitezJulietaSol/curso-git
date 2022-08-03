@@ -14,9 +14,9 @@ jobs:
         uses: tj-actions/branch-names@v5.2
       - name: validation
         run: |
-          if ${{ (steps.branch-name.outputs.ref_branch != 'canary') &&
+          if [[ (steps.branch-name.outputs.ref_branch != 'canary') &&
           (steps.branch-name.outputs.ref_branch != 'qa') &&
-          (steps.branch-name.outputs.ref_branch != 'develop') }}; then
+          (steps.branch-name.outputs.ref_branch != 'develop') ]]; then
               echo "NEED=true" >> "$GITHUB_ENV"
           else
               echo "NEED=false" >> "$GITHUB_ENV"
@@ -31,7 +31,7 @@ jobs:
           destination_branch: canary
           github_token: ${{ github.token }}
           pr_title: >-
-             [Backport $(steps.branch-name.outputs.ref_branch)] to
+             [Backport ${{ steps.branch-name.outputs.ref_branch }} ] to
               canary
       - name: backport-to-qa
         if: ${{ steps.branch-name.outputs.ref_branch == 'canary' && env.NEED != 'true' }}
@@ -40,7 +40,7 @@ jobs:
           destination_branch: qa
           github_token: ${{ github.token }}
           pr_title: >-
-            [Backport $(steps.branch-name.outputs.ref_branch)] to 
+            [Backport ${{ steps.branch-name.outputs.ref_branch }} ] to 
              qa
       - name: backport-to-dev
         if: ${{ steps.branch-name.outputs.ref_branch == 'qa' && env.NEED != 'true' }}
@@ -49,5 +49,5 @@ jobs:
           destination_branch: develop
           github_token: ${{ github.token }}
           pr_title: >-
-            [Backport $(steps.branch-name.outputs.ref_branch)] to 
+            [Backport ${{ steps.branch-name.outputs.ref_branch }} ] to 
              develop
