@@ -14,9 +14,10 @@ jobs:
         uses: tj-actions/branch-names@v5.2
       - name: validation
         run: |
-          if ${{ (steps.branch-name.outputs.ref_branch != 'canary') &&
-          (steps.branch-name.outputs.ref_branch != 'qa') &&
-          (steps.branch-name.outputs.ref_branch != 'develop') }}; then
+          if ${{ (steps.branch-name.outputs.current_branch != 'master') &&
+          (steps.branch-name.outputs.current_branch != 'canary') &&
+          (steps.branch-name.outputs.current_branch != 'qa') &&
+          (steps.branch-name.outputs.current_branch != 'develop') }}; then
               echo "NEED=true" >> "$GITHUB_ENV"
           else
               echo "NEED=false" >> "$GITHUB_ENV"
@@ -27,10 +28,11 @@ jobs:
       - name: create new branch
         if: env.NEED == 'true'
         uses: peterjgrainger/action-create-branch@v2.2.0
+        run: echo FOO=foobar--$(date +%s) >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          branch: 'backport/release-candidate'
+          branch: backport/${{ env.FOO }}
       - name: backport-to-canary
         if: ${{ steps.branch-name.outputs.ref_branch == 'master' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
