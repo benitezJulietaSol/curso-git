@@ -17,30 +17,32 @@ jobs:
     - name: Get branch name
       id: branch-name
       uses: tj-actions/branch-names@v5.2
-    # Don't run on closed unmerged pull requests
-    # before checkout validate if backport is necessary
-    if: ${{ (github.event.pull_request.merged) && (steps.branch-name.outputs.head_ref_branch != 'canary') && (steps.branch-name.outputs.head_ref_branch != 'qa') && (steps.branch-name.outputs.head_ref_branch != 'dev') }}
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - name: backport-to-canary
-        if: ${{ steps.branch-name.outputs.ref_branch == 'master' }}
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_branch: canary
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_title: "[Backport ${steps.branch-name.outputs.head_ref_branch}] to canary"
-      - name: backport-to-qa
-        if: ${{ steps.branch-name.outputs.ref_branch == 'canary' }}
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_branch: qa
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_title: "[Backport ${steps.branch-name.outputs.head_ref_branch}] to qa"
-      - name: backport-to-dev
-        if: ${{ steps.branch-name.outputs.ref_branch == 'qa' }}
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_branch: develop
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pr_title: "[Backport ${steps.branch-name.outputs.head_ref_branch}] to develop"
+    - name: Build Non prod
+      needs: [rules] 
+      # Don't run on closed unmerged pull requests
+      # before checkout validate if backport is necessary
+      if: ${{ (github.event.pull_request.merged) && (steps.branch-name.outputs.head_ref_branch != 'canary') && (steps.branch-name.outputs.head_ref_branch != 'qa') && (steps.branch-name.outputs.head_ref_branch != 'dev') }}
+      steps:
+        - name: checkout
+          uses: actions/checkout@v2
+        - name: backport-to-canary
+          if: ${{ steps.branch-name.outputs.ref_branch == 'master' }}
+          uses: repo-sync/pull-request@v2
+          with:
+            destination_branch: canary
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            pr_title: "[Backport ${steps.branch-name.outputs.head_ref_branch}] to canary"
+        - name: backport-to-qa
+          if: ${{ steps.branch-name.outputs.ref_branch == 'canary' }}
+          uses: repo-sync/pull-request@v2
+          with:
+            destination_branch: qa
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            pr_title: "[Backport ${steps.branch-name.outputs.head_ref_branch}] to qa"
+        - name: backport-to-dev
+          if: ${{ steps.branch-name.outputs.ref_branch == 'qa' }}
+          uses: repo-sync/pull-request@v2
+          with:
+            destination_branch: develop
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            pr_title: "[Backport ${steps.branch-name.outputs.head_ref_branch}] to develop"
