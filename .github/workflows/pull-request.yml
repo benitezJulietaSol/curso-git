@@ -12,10 +12,6 @@ jobs:
       - name: Get branch name
         id: branch-name
         uses: tj-actions/branch-names@v5.2
-        if: >-
-          ${{ (steps.branch-name.outputs.head_ref_branch != 'canary') &&
-          (steps.branch-name.outputs.head_ref_branch != 'qa') &&
-          (steps.branch-name.outputs.head_ref_branch != 'dev') }}
           - name: checkout
             uses: actions/checkout@v2
           - name: backport-to-canary
