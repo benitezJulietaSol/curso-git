@@ -12,11 +12,14 @@ jobs:
       - name: Get branch name
         id: branch-name
         uses: tj-actions/branch-names@v5.2
+      - name: set up
+        run: echo FOO=foobar--$(date +%s) >> $GITHUB_ENV
       - name: validation
         run: |
-          if ${{ (steps.branch-name.outputs.ref_branch != 'canary') &&
-          (steps.branch-name.outputs.ref_branch != 'qa') &&
-          (steps.branch-name.outputs.ref_branch != 'develop') }}; then
+          if ${{ (steps.branch-name.outputs.current_branch != 'master') &&
+          (steps.branch-name.outputs.current_branch != 'canary') &&
+          (steps.branch-name.outputs.current_branch != 'qa') &&
+          (steps.branch-name.outputs.current_branch != 'develop') }}; then
               echo "NEED=true" >> "$GITHUB_ENV"
           else
               echo "NEED=false" >> "$GITHUB_ENV"
@@ -30,7 +33,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          branch: 'backport/release-candidate'
+          branch: backport/${{ env.FOO }}
       - name: backport-to-canary
         if: ${{ steps.branch-name.outputs.ref_branch == 'master' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
