@@ -51,7 +51,7 @@ jobs:
         if: ${{ steps.branch-name.outputs.ref_branch == 'master' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: backport/release-candidate
+          source_branch: backport/${{ env.FOO }}
           destination_branch: canary
           github_token: ${{ github.token }}
           pr_title: >-
@@ -61,7 +61,7 @@ jobs:
         if: ${{ steps.branch-name.outputs.ref_branch == 'canary' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: backport/release-candidate
+          source_branch: backport/${{ env.FOO }}
           destination_branch: qa
           github_token: ${{ github.token }}
           pr_title: >-
@@ -71,7 +71,7 @@ jobs:
         if: ${{ steps.branch-name.outputs.ref_branch == 'qa' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
-          source_branch: backport/release-candidate
+          source_branch: backport/${{ env.FOO }}
           destination_branch: develop
           github_token: ${{ github.token }}
           pr_title: >-
