@@ -18,11 +18,11 @@ jobs:
         env:
           STRATEGY_1: ${{ steps.branch-name.outputs.base_ref_branch }}
         run: echo "$STRATEGY_1"
-        - name: borrar esto 2
+      - name: borrar esto 2
         env:
           STRATEGY_2: ${{ steps.branch-name.outputs.current_branch }}
         run: echo "$STRATEGY_2"
-        - name: borrar esto 3
+      - name: borrar esto 3
         env:
           STRATEGY_3: ${{ steps.branch-name.outputs.head_ref_branch }}
         run: echo "$STRATEGY_3"
