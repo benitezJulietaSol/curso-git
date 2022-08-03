@@ -22,32 +22,32 @@ jobs:
               echo "NEED=false" >> "$GITHUB_ENV"
           fi     
       - name: checkout
-        if: env.NEED != 'true'
+        if: env.NEED == 'true'
         uses: actions/checkout@v2
       - name: backport-to-canary
-        if: ${{ steps.branch-name.outputs.ref_branch == 'master' && env.NEED != 'true' }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'master' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: canary
           github_token: ${{ github.token }}
           pr_title: >-
-             [Backport ${{ steps.branch-name.outputs.ref_branch }} ] to
+             [Backport ${{ steps.branch-name.outputs.ref_branch }}] to
               canary
       - name: backport-to-qa
-        if: ${{ steps.branch-name.outputs.ref_branch == 'canary' && env.NEED != 'true' }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'canary' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: qa
           github_token: ${{ github.token }}
           pr_title: >-
-            [Backport ${{ steps.branch-name.outputs.ref_branch }} ] to 
+            [Backport ${{ steps.branch-name.outputs.ref_branch }}] to 
              qa
       - name: backport-to-dev
-        if: ${{ steps.branch-name.outputs.ref_branch == 'qa' && env.NEED != 'true' }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'qa' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: develop
           github_token: ${{ github.token }}
           pr_title: >-
-            [Backport ${{ steps.branch-name.outputs.ref_branch }} ] to 
+            [Backport ${{ steps.branch-name.outputs.ref_branch }}] to 
              develop
