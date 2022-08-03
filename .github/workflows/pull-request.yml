@@ -21,7 +21,7 @@ jobs:
           destination_branch: canary
           github_token: ${{ github.token }}
           pr_title: >-
-              Backport ${steps.branch-name.outputs.head_ref_branch}] to
+              Backport $(steps.branch-name.outputs.head_ref_branch)] to
               canary
       - name: backport-to-qa
         if: ${{ steps.branch-name.outputs.ref_branch == 'canary' }}
@@ -30,7 +30,7 @@ jobs:
           destination_branch: qa
           github_token: ${{ github.token }}
           pr_title: >-
-            [Backport ${steps.branch-name.outputs.head_ref_branch}] to 
+            [Backport $(steps.branch-name.outputs.head_ref_branch)] to 
             develop
       - name: backport-to-dev
         if: ${{ steps.branch-name.outputs.ref_branch == 'qa' }}
@@ -39,5 +39,5 @@ jobs:
           destination_branch: develop
           github_token: ${{ github.token }}
           pr_title: >-
-            [Backport ${steps.branch-name.outputs.head_ref_branch}] to 
+            [Backport $(steps.branch-name.outputs.head_ref_branch)] to 
             develop
