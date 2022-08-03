@@ -31,9 +31,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           branch: 'backport/release-candidate'
-          sha: '${{ github.event.pull_request.head.sha }}'
       - name: backport-to-canary
-        if: ${{ steps.branch-name.outputs.ref_branch == 'master' && env.NEED == 'true' && sha }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'master' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
           source_branch: backport/release-candidate
@@ -43,7 +42,7 @@ jobs:
              [Backport ${{ steps.branch-name.outputs.ref_branch }}] to
               canary
       - name: backport-to-qa
-        if: ${{ steps.branch-name.outputs.ref_branch == 'canary' && env.NEED == 'true' && sha }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'canary' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
           source_branch: backport/release-candidate
@@ -53,7 +52,7 @@ jobs:
             [Backport ${{ steps.branch-name.outputs.ref_branch }}] to 
              qa
       - name: backport-to-dev
-        if: ${{ steps.branch-name.outputs.ref_branch == 'qa' && env.NEED == 'true' && sha }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'qa' && env.NEED == 'true' }}
         uses: repo-sync/pull-request@v2
         with:
           source_branch: backport/release-candidate
