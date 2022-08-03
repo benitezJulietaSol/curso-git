@@ -16,10 +16,9 @@ jobs:
         run: echo FOO=foobar--$(date +%s) >> $GITHUB_ENV
       - name: validation
         run: |
-          if ${{ (steps.branch-name.outputs.current_branch != 'master') &&
-          (steps.branch-name.outputs.current_branch != 'canary') &&
-          (steps.branch-name.outputs.current_branch != 'qa') &&
-          (steps.branch-name.outputs.current_branch != 'develop') }}; then
+          if ${{ (steps.branch-name.outputs.head_ref_branch != 'canary') &&
+          (steps.branch-name.outputs.head_ref_branch != 'qa') &&
+          (steps.branch-name.outputs.head_ref_branch != 'develop') }}; then
               echo "NEED=true" >> "$GITHUB_ENV"
           else
               echo "NEED=false" >> "$GITHUB_ENV"
