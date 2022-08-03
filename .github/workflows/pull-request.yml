@@ -22,6 +22,8 @@ jobs:
       id: branch-name
       uses: tj-actions/branch-names@v5.2
 
+    # Don't run on closed unmerged pull requests
+    if: github.event.pull_request.merged
     # before checkout validate if backport is necessary
     if: steps.branch-name.outputs.head_ref_branch != 'canary' && steps.branch-name.outputs.head_ref_branch != 'qa' && steps.branch-name.outputs.head_ref_branch != 'dev'
 
