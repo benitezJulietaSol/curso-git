@@ -15,7 +15,8 @@ jobs:
         if: >-
           ${{ (steps.branch-name.outputs.ref_branch != 'canary') &&
           (steps.branch-name.outputs.ref_branch != 'qa') &&
-          (steps.branch-name.outputs.ref_branch != 'dev') }}
+          (steps.branch-name.outputs.ref_branch != 'develop') }}
+        steps:
           - name: checkout
             uses: actions/checkout@v2
           - name: backport-to-canary
@@ -25,7 +26,7 @@ jobs:
               destination_branch: canary
               github_token: ${{ github.token }}
               pr_title: >-
-                  [Backport $(steps.branch-name.outputs.ref_branch)] to
+                 [Backport $(steps.branch-name.outputs.ref_branch)] to
                   canary
           - name: backport-to-qa
             if: ${{ steps.branch-name.outputs.ref_branch == 'canary' }}
@@ -35,7 +36,7 @@ jobs:
               github_token: ${{ github.token }}
               pr_title: >-
                 [Backport $(steps.branch-name.outputs.ref_branch)] to 
-                qa
+                 qa
           - name: backport-to-dev
             if: ${{ steps.branch-name.outputs.ref_branch == 'qa' }}
             uses: repo-sync/pull-request@v2
@@ -44,4 +45,4 @@ jobs:
               github_token: ${{ github.token }}
               pr_title: >-
                 [Backport $(steps.branch-name.outputs.ref_branch)] to 
-                develop
+                 develop
