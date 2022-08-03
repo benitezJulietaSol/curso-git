@@ -12,14 +12,18 @@ jobs:
       - name: Get branch name
         id: branch-name
         uses: tj-actions/branch-names@v5.2
-      - name: checkout
-        if: >-
-          ${{ (steps.branch-name.outputs.ref_branch != 'canary') &&
+      - name: checkout and validation
+        run: |
+          if [[ ${{ (steps.branch-name.outputs.ref_branch != 'canary') &&
           (steps.branch-name.outputs.ref_branch != 'qa') &&
-          (steps.branch-name.outputs.ref_branch != 'develop') }}
+          (steps.branch-name.outputs.ref_branch != 'develop') }} ]]; then
+              echo "NEED=true" >> "$GITHUB_ENV"
+          else
+              echo "NEED=false" >> "$GITHUB_ENV"
+          fi          
         uses: actions/checkout@v2
       - name: backport-to-canary
-        if: ${{ steps.branch-name.outputs.ref_branch == 'master' }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'master' && env.NEED != 'true' }}
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: canary
@@ -28,7 +32,7 @@ jobs:
              [Backport $(steps.branch-name.outputs.ref_branch)] to
               canary
       - name: backport-to-qa
-        if: ${{ steps.branch-name.outputs.ref_branch == 'canary' }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'canary' && env.NEED != 'true' }}
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: qa
@@ -37,7 +41,7 @@ jobs:
             [Backport $(steps.branch-name.outputs.ref_branch)] to 
              qa
       - name: backport-to-dev
-        if: ${{ steps.branch-name.outputs.ref_branch == 'qa' }}
+        if: ${{ steps.branch-name.outputs.ref_branch == 'qa' && env.NEED != 'true' }}
         uses: repo-sync/pull-request@v2
         with:
           destination_branch: develop
