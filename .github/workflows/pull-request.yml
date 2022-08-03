@@ -6,9 +6,11 @@ on:
   push:
     branches:
     - master
+    - canary
     - qa
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+
+  pull_request:
+    types: [closed]
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -19,12 +21,35 @@ jobs:
     - name: Get branch name
       id: branch-name
       uses: tj-actions/branch-names@v5.2
+
+    # Don't run on closed unmerged pull requests
+    if: github.event.pull_request.merged
+    # before checkout validate if backport is necessary
+    if: steps.branch-name.outputs.head_ref_branch != 'canary' && steps.branch-name.outputs.head_ref_branch != 'qa' && steps.branch-name.outputs.head_ref_branch != 'dev'
+
     - name: checkout
       uses: actions/checkout@v2
-    - name: pull-request
-      if: ${{ steps.branch-name.outputs.head_ref_branch != 'develop' && steps.branch-name.outputs.head_ref_branch != 'qa' }}
-      uses: repo-sync/pull-request@v2
-      with:
-        destination_branch: develop
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        pr_title: "Pulling ${{ steps.branch-name.outputs.head_ref_branch }} into master"
+
+    - name: backport-to-canary
+       if: ${{ steps.branch-name.outputs.ref_branch == 'master' }}
+       uses: repo-sync/pull-request@v2
+       with:
+          destination_branch: canary
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "[Backport ${steps.branch-name.outputs.head_ref_branch}] to canary"
+
+    - name: backport-to-qa
+       if: ${{ steps.branch-name.outputs.ref_branch == 'canary' }}
+       uses: repo-sync/pull-request@v2
+       with:
+          destination_branch: qa
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "[Backport ${steps.branch-name.outputs.head_ref_branch}] to qa"
+
+    - name: backport-to-dev
+       if: ${{ steps.branch-name.outputs.ref_branch == 'qa' }}
+       uses: repo-sync/pull-request@v2
+       with:
+          destination_branch: develop
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "[Backport ${steps.branch-name.outputs.head_ref_branch}] to develop"
